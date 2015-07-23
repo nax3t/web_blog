@@ -4,11 +4,16 @@ class PostsController < ApplicationController
   end
 
   def new
-    @post = Post.new
+    if user_signed_in?
+      @post = Post.new
+    else
+      redirect_to new_user_session_path
+      flash.notice = "You need to sign in first"
+    end
   end
 
   def create
-    @post = Post.new post_params
+    @post = current_user.posts.build post_params
     if @post.save
       redirect_to @post
     else
@@ -22,6 +27,12 @@ class PostsController < ApplicationController
 
   def edit
     @post = Post.find params[:id]
+    if @post.user == current_user
+      render 'edit'
+    else
+      redirect_to posts_path
+      flash.alert = "Invalid Permissions"
+    end
   end
 
   def update
@@ -35,9 +46,14 @@ class PostsController < ApplicationController
 
   def destroy
     @post = Post.find params[:id]
-    @post.destroy, alert: Successfuly deleted
-
-    redirect_to posts_index
+    if @post.user = current_user
+      @post.destroy
+      redirect_to posts_path
+      flash.notice = "Post successfully deleted"
+    else
+      redirect_to posts_path
+      flash.notice = "Invalid Permissions"
+    end
   end
 
   private
