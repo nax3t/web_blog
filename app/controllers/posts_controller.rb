@@ -52,7 +52,7 @@ class PostsController < ApplicationController
       flash.notice = "Post successfully deleted"
     else
       redirect_to posts_path
-      flash.notice = "Invalid Permissions"
+      flash.alert = "Invalid Permissions"
     end
   end
 
